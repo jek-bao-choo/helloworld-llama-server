@@ -16,5 +16,5 @@ xattr: Command to manipulate extended file attributes.
 -d: Flag to delete an attribute.
 com.apple.quarantine: The specific attribute macOS uses to mark downloaded files for Gatekeeper checks.
 ```
-- 
- 
+`uv init`
+`uv add click requests`
