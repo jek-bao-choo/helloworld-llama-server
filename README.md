@@ -40,3 +40,6 @@ my_llama_cli/
 ```bash
 uv run main.py send-prompt --prompt "Explain quantum physics simply."
 ```
+
+# Unit Testing
+`uv add --dev pytest pytest-mock`

@@ -8,3 +8,14 @@ dependencies = [
     "click>=8.1.8",
     "requests>=2.32.3",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-mock>=3.14.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "." # Add the current directory (your project root) to the Python path
+]
