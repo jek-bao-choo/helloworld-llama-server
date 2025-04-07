@@ -18,3 +18,25 @@ com.apple.quarantine: The specific attribute macOS uses to mark downloaded files
 ```
 `uv init`
 `uv add click requests`
+
+
+```
+my_llama_cli/
+├── .venv/                 # Your virtual environment (managed by uv)
+├── bin/
+│   └── llama-b5061-bin-macos-x64/
+│       └── llama-server   # Your server executable
+├── model/
+│   └── gemma-3-1b-it-Q4_K_M.gguf # Your model file
+├── main.py                # New main entry point
+├── cli.py                 # Click commands logic
+├── util.py                # Helper functions and config
+├── pyproject.toml         # Project definition
+└── .llama_server.pid      # Created/deleted by the script
+```
+
+`uv run main.py`
+
+```bash
+uv run main.py send-prompt --prompt "Explain quantum physics simply."
+```
