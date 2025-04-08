@@ -3,7 +3,7 @@ import yaml # Requires PyYAML dependency
 import os
 import sys
 
-CONFIG_FILENAME = 'config.yaml'
+CONFIG_FILENAME = 'llama_config.yaml'
 
 def load_config():
     """Loads configuration from CONFIG_FILENAME using PyYAML."""

@@ -1,4 +1,4 @@
-# config.yaml - Configuration for Llama Server Manager & Chat
+# llama_config.yaml - Configuration for Llama Server Manager & Chat
 
 llama_server:
   # --- Paths MUST be configured correctly ---
