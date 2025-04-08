@@ -18,6 +18,7 @@ com.apple.quarantine: The specific attribute macOS uses to mark downloaded files
 ```
 `uv init`
 `uv add click requests litellm`
+`uv add pyyaml`
 
 
 ```
@@ -38,7 +39,7 @@ my_llama_cli/
 `uv run main.py`
 
 ```bash
-uv run main.py send-prompt --prompt "Explain quantum physics simply."
+uv run main.py --prompt "What is LiteLLM?"
 ```
 
 # Unit Testing

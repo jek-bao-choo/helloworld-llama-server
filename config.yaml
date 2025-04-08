@@ -1,0 +1,29 @@
+# config.yaml - Configuration for Llama Server Manager & Chat
+
+llama_server:
+  # --- Paths MUST be configured correctly ---
+  # Path to the llama-server executable
+  server_path: bin/llama-b5061-bin-macos-x64/llama-server
+  # Path to the model file
+  model_path: model/gemma-3-1b-it-Q4_K_M.gguf
+
+  # --- Server Parameters ---
+  port: 8012
+  ctx_size: 0
+  batch_size: 1024
+  ub: 1024
+  cache_reuse: 256
+
+chat:
+  # --- API endpoint for OpenAI-compatible server ---
+  # Ensure this points to your llama-server's OpenAI endpoint (usually includes /v1)
+  api_base_url: http://127.0.0.1:8012/v1
+
+  # --- Model string recognized by the server via the API ---
+  # For llama-server's OpenAI endpoint, this might just be the model filename.
+  # Adjust if your server expects a specific identifier.
+  # Add the 'openai/' prefix
+  model_string: openai/gemma-3-1b-it-Q4_K_M.gguf
+
+  # --- API Key (usually ignored by local servers, but openai lib requires it) ---
+  api_key: dummy-key
