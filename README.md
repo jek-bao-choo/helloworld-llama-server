@@ -17,7 +17,7 @@ xattr: Command to manipulate extended file attributes.
 com.apple.quarantine: The specific attribute macOS uses to mark downloaded files for Gatekeeper checks.
 ```
 `uv init`
-`uv add click requests`
+`uv add click requests litellm`
 
 
 ```
