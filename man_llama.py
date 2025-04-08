@@ -118,5 +118,3 @@ def status_llama_server():
             return "STALE_PID", f"Server is STOPPED (Stale PID {pid} found in '{pid_llama.PID_FILENAME}')."
     else:
         return "STOPPED", f"Server is STOPPED (No PID file '{pid_llama.PID_FILENAME}' found)."
-
-# Removed restart_llama_server as CLI command is removed.
