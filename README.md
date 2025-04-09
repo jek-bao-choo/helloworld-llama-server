@@ -54,7 +54,7 @@ my_llama_cli/
 `uv run main.py`
 
 ```bash
-uv run main.py --prompt "What is LiteLLM?"
+uv run main.py --prompt "What is your knowledge cutoff?"
 
 uv run pytest
 ```

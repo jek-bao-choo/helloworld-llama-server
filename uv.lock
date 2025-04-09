@@ -206,8 +206,6 @@ source = { virtual = "." }
 dependencies = [
     { name = "click" },
     { name = "litellm" },
-    { name = "pyyaml" },
-    { name = "requests" },
 ]
 
 [package.dev-dependencies]
@@ -220,8 +218,6 @@ dev = [
 requires-dist = [
     { name = "click", specifier = ">=8.1.8" },
     { name = "litellm", specifier = ">=1.65.4.post1" },
-    { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "requests", specifier = ">=2.32.3" },
 ]
 
 [package.metadata.requires-dev]
