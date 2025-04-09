@@ -1,7 +1,6 @@
-# chat_llama.py
+# chatpoint.py
 import litellm
 import sys
-# REMOVED: from config_loader import CHAT_CONFIG
 
 # --- Hardcoded Configuration ---
 # Should match the port used in man_llama.py

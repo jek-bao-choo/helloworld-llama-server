@@ -3,7 +3,7 @@ import click
 import time
 import sys
 import man_llama
-import chat_llama
+import chatpoint
 
 def _ensure_server_running_or_fail():
     """Checks server status, starts if needed. Returns True if running, False on failure."""
