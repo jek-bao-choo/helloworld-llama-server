@@ -21,6 +21,10 @@ com.apple.quarantine: The specific attribute macOS uses to mark downloaded files
 `uv add pyyaml`
 
 
+# Unit Testing
+`uv add --dev pytest pytest-mock`
+
+
 ```
 my_llama_cli/
 ├── .venv/                      # Virtual environment managed by uv
@@ -51,7 +55,6 @@ my_llama_cli/
 
 ```bash
 uv run main.py --prompt "What is LiteLLM?"
-```
 
-# Unit Testing
-`uv add --dev pytest pytest-mock`
+uv run pytest
+```
