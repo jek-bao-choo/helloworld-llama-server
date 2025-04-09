@@ -40,7 +40,7 @@ def chat_message_command(prompt):
 
     try:
         # send_prompt now uses hardcoded defaults internally
-        stream = chat_llama.send_prompt(prompt=prompt)
+        stream = chatpoint.send_prompt(prompt=prompt)
         found_content = False
         for chunk in stream:
              if chunk:
