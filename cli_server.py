@@ -1,4 +1,4 @@
-# cli.py
+# cli_server.py
 import click
 import time
 import sys

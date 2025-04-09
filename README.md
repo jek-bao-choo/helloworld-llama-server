@@ -39,7 +39,7 @@ my_llama_cli/
 ├── pid_llama.py                # Module for PID file and process checking logic
 ├── man_llama.py                # Module for server start/stop/status logic (hardcoded config)
 ├── chatpoint.py                # Module for chat interaction logic using LiteLLM (hardcoded config/switcher) <-- RENAMED
-├── cli.py                      # Module defining Click command(s) and orchestration
+├── cli_server.py                      # Module defining Click command(s) and orchestration
 ├── main.py                     # Minimal main application entry point script
 ├── init.py                 # Makes the root directory a Python package (optional but good practice)
 ├── pyproject.toml              # Project definition, dependencies for uv/pip
