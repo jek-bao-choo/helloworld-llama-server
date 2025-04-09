@@ -23,17 +23,31 @@ com.apple.quarantine: The specific attribute macOS uses to mark downloaded files
 
 ```
 my_llama_cli/
-├── .venv/                 # Your virtual environment (managed by uv)
-├── bin/
+├── .venv/                      # Virtual environment managed by uv
+├── bin/                        # Example dir for server executable (as in config.yaml)
 │   └── llama-b5061-bin-macos-x64/
-│       └── llama-server   # Your server executable
-├── model/
-│   └── gemma-3-1b-it-Q4_K_M.gguf # Your model file
-├── main.py                # New main entry point
-├── cli.py                 # Click commands logic
-├── util.py                # Helper functions and config
-├── pyproject.toml         # Project definition
-└── .llama_server.pid      # Created/deleted by the script
+│       └── llama-server        # llama-server executable
+├── model/                      # Example dir for model files (as in config.yaml)
+│   └── gemma-3-1b-it-Q4_K_M.gguf # LLM model file
+├── tests/                      # Unit and integration tests
+│   ├── init.py             # Makes 'tests' a Python package
+│   ├── test_config_loader.py   # Tests for config loading
+│   ├── test_pid_llama.py       # Tests for PID/process utilities
+│   ├── test_man_llama.py       # Tests for server management logic
+│   ├── test_chat_llama.py      # Tests for chat interaction logic
+│   └── test_cli.py             # Tests for the Click command interface
+├── .gitignore                  # Standard Git ignore file (Recommended)
+├── config.yaml                 # Main configuration file (YAML format)
+├── config_loader.py            # Module to load and parse config.yaml
+├── pid_llama.py                # Module for PID file and process checking logic
+├── man_llama.py                # Module for server start/stop/status logic
+├── chat_llama.py               # Module for chat interaction logic (using LiteLLM)
+├── cli.py                      # Module defining Click command(s) and orchestration
+├── main.py                     # Minimal main application entry point script
+├── init.py                 # Makes the root directory a Python package (optional but good practice)
+├── pyproject.toml              # Project definition, dependencies for uv/pip
+├── README.md                   # Project documentation (this file)
+└── .llama_server.pid           # Runtime file storing PID of running server (auto-generated)
 ```
 
 `uv run main.py`

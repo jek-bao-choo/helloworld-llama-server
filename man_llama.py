@@ -5,11 +5,22 @@ import subprocess
 import time
 import signal
 import pid_llama
-from config_loader import LLAMA_CONFIG # Import loaded config
+# REMOVED: from config_loader import LLAMA_CONFIG
+
+# --- Hardcoded Configuration ---
+# Values copied from previous config.yaml - MODIFY THESE PATHS/VALUES AS NEEDED
+SERVER_PATH = "bin/llama-b5061-bin-macos-x64/llama-server"
+MODEL_PATH = "model/gemma-3-1b-it-Q4_K_M.gguf"
+PORT = 8012
+CTX_SIZE = 0
+BATCH_SIZE = 1024
+UB = 1024
+CACHE_REUSE = 256
+# --- End Hardcoded Configuration ---
 
 def start_llama_server():
     """
-    Starts the llama-server process using settings from config file.
+    Starts the llama-server process using hardcoded settings.
     Returns tuple (success: bool, message: str, pid: int | None).
     """
     pid = pid_llama.read_pid()
@@ -19,20 +30,16 @@ def start_llama_server():
     if pid and not pid_llama.is_process_running(pid):
         pid_llama.delete_pid_file()
 
-    # Use loaded config
-    server_cfg = LLAMA_CONFIG
-    server_path = server_cfg['server_path']
-    model_path = server_cfg['model_path']
-
-    if not server_path or not os.path.exists(server_path):
-       return False, f"Server executable path missing or not found in config: {server_path}", None
-    if not model_path or not os.path.exists(model_path):
-       return False, f"Model file path missing or not found in config: {model_path}", None
+    # Use constants defined above
+    if not SERVER_PATH or not os.path.exists(SERVER_PATH):
+       return False, f"Server executable path not found or not configured: {SERVER_PATH}", None
+    if not MODEL_PATH or not os.path.exists(MODEL_PATH):
+       return False, f"Model file path not found or not configured: {MODEL_PATH}", None
 
     command = [
-        server_path, '-m', model_path, '--port', str(server_cfg['port']),
-        '--ctx-size', str(server_cfg['ctx_size']), '-b', str(server_cfg['batch_size']),
-        '-ub', str(server_cfg['ub']), '--cache-reuse', str(server_cfg['cache_reuse'])
+        SERVER_PATH, '-m', MODEL_PATH, '--port', str(PORT),
+        '--ctx-size', str(CTX_SIZE), '-b', str(BATCH_SIZE),
+        '-ub', str(UB), '--cache-reuse', str(CACHE_REUSE)
     ]
     cmd_str = ' '.join(command)
 
@@ -61,12 +68,15 @@ def start_llama_server():
         pid_llama.delete_pid_file()
         return False, f"Failed to start server process: {e}. Command: {cmd_str}", None
 
+# --- stop_llama_server and status_llama_server remain unchanged ---
+# They primarily interact with pid_llama, not the start configuration.
+
 def stop_llama_server(force=False):
     """
     Stops the running llama-server process identified by the PID file.
     Returns tuple (success: bool, message: str).
     """
-    # (Logic remains largely the same as previous version, uses pid_llama)
+    # (Logic remains the same as previous version, uses pid_llama)
     pid = pid_llama.read_pid()
     if not pid: return True, "Server not running (no PID file)."
     if not pid_llama.is_process_running(pid):
@@ -103,10 +113,9 @@ def stop_llama_server(force=False):
              pid_llama.delete_pid_file(); return True, f"Force stop error but process died: {e}"
          return False, f"Force stop error: {e}"
 
-
 def status_llama_server():
     """
-    Checks the status of the llama-server process using config.
+    Checks the status of the llama-server process.
     Returns tuple (status_string: str, message: str).
     """
     # (Logic remains the same, uses pid_llama)
