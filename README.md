@@ -30,20 +30,18 @@ my_llama_cli/
 ├── .venv/                      # Virtual environment managed by uv
 ├── bin/                        # Example dir for server executable
 │   └── llama-b5061-bin-macos-x64/
-│       └── llama-server        # llama-server executable (path hardcoded in man_llama.py)
+│       └── llama-server        # llama-server executable (path hardcoded in llama_man.py)
 ├── model/                      # Example dir for model files
-│   └── gemma-3-1b-it-Q4_K_M.gguf # LLM model file (path hardcoded in man_llama.py)
+│   └── gemma-3-1b-it-Q4_K_M.gguf # LLM model file (path hardcoded in llama_man.py)
 ├── tests/                      # Unit tests
 │   ├── init.py             # Makes 'tests' a Python package
-│   ├── test_pid_llama.py       # Tests for pid_llama.py
-│   ├── test_man_llama.py       # Tests for man_llama.py
-│   ├── test_chatpoint.py       # Tests for chatpoint.py (Rename from test_sendchat.py) <-- RENAMED TEST
-│   └── test_cli.py             # Tests for cli.py
+│   ├── test_llama_pid.py       # Tests for llama_pid.py
+│   ├── test_llama_man.py       # Tests for llama_man.py
+│   └── test_clitest_server.py  # Tests for clitest_server.py (Rename from test_cli_server.py) <-- RENAMED TEST
 ├── .gitignore                  # Standard Git ignore file (Recommended)
 ├── llama_pid.py                # Module for PID file and process checking logic
-├── llama_man.py                # Module for server start/stop/status logic (hardcoded config)
-├── chatpoint.py                # Module for chat interaction logic using LiteLLM (hardcoded config/switcher) <-- RENAMED
-├── cli_server.py                      # Module defining Click command(s) and orchestration
+├── llama_man.py                # Module for server start/stop/status/ensure logic (hardcoded config)
+├── clitest_server.py           # Module defining Click command and orchestration (using requests) <-- RENAMED
 ├── main.py                     # Minimal main application entry point script
 ├── init.py                 # Makes the root directory a Python package (optional but good practice)
 ├── pyproject.toml              # Project definition, dependencies for uv/pip
