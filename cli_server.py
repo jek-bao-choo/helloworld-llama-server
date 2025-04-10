@@ -2,13 +2,13 @@
 import click
 import time
 import sys
-import man_llama
+import llama_man
 import chatpoint
 
 def _ensure_server_running_or_fail():
     """Checks server status, starts if needed. Returns True if running, False on failure."""
     # This function now relies on man_llama using its internal hardcoded config
-    status_code, message = man_llama.status_llama_server()
+    status_code, message = llama_man.status_llama_server()
     click.echo(f"Initial server status: {status_code} - {message}")
 
     if status_code == "RUNNING":

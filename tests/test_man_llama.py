@@ -9,8 +9,8 @@ import signal
 from unittest.mock import MagicMock # Useful for creating mock objects like Popen return
 
 # Modules to test and mock
-import man_llama
-import pid_llama
+import llama_man
+import llama_pid
 # Import config_loader only to potentially mock its variables if needed,
 # but we prefer patching the variable where it's used (in man_llama)
 # import config_loader
@@ -34,7 +34,7 @@ def test_status_server_running(mocker):
     mocker.patch('man_llama.pid_llama.read_pid', return_value=123)
     mocker.patch('man_llama.pid_llama.is_process_running', return_value=True)
 
-    status, message = man_llama.status_llama_server()
+    status, message = llama_man.status_llama_server()
 
     assert status == "RUNNING"
     assert "Server is RUNNING with PID 123" in message
@@ -45,7 +45,7 @@ def test_status_server_stopped_no_pid(mocker):
     # Mock is_process_running to ensure it's not called if read_pid is None
     mock_is_running = mocker.patch('man_llama.pid_llama.is_process_running')
 
-    status, message = man_llama.status_llama_server()
+    status, message = llama_man.status_llama_server()
 
     assert status == "STOPPED"
     assert "No PID file" in message
@@ -71,7 +71,7 @@ def test_start_server_already_running(mocker):
     mocker.patch('man_llama.pid_llama.is_process_running', return_value=True)
     mock_popen = mocker.patch('subprocess.Popen') # Check it's not called
 
-    success, message, pid = man_llama.start_llama_server()
+    success, message, pid = llama_man.start_llama_server()
 
     assert not success
     assert "already running" in message
@@ -96,7 +96,7 @@ def test_start_server_success(mocker):
     # Mock successful PID write
     mock_write_pid = mocker.patch('man_llama.pid_llama.write_pid', return_value=True)
 
-    success, message, pid = man_llama.start_llama_server()
+    success, message, pid = llama_man.start_llama_server()
 
     assert success
     assert "started successfully" in message
@@ -124,7 +124,7 @@ def test_start_server_path_not_found(mocker):
     # Note: This side_effect needs careful checking if more paths were added
     mocker.patch('os.path.exists', side_effect=lambda path: path != MOCK_LLAMA_CONFIG['server_path'])
 
-    success, message, pid = man_llama.start_llama_server()
+    success, message, pid = llama_man.start_llama_server()
 
     assert not success
     # Update the string we are checking for:
@@ -143,7 +143,7 @@ def test_start_server_immediate_fail(mocker):
     mocker.patch('time.sleep')
     mock_delete_pid = mocker.patch('man_llama.pid_llama.delete_pid_file')
 
-    success, message, pid = man_llama.start_llama_server()
+    success, message, pid = llama_man.start_llama_server()
 
     assert not success
     assert "failed on startup (exit code 1)" in message
@@ -170,7 +170,7 @@ def test_stop_server_stale_pid(mocker):
     mock_delete_pid = mocker.patch('man_llama.pid_llama.delete_pid_file')
     mock_kill = mocker.patch('os.kill')
 
-    success, message = man_llama.stop_llama_server()
+    success, message = llama_man.stop_llama_server()
 
     assert success
     assert "Stale PID 456" in message
@@ -187,7 +187,7 @@ def test_stop_server_graceful_success_unix(mocker):
     mocker.patch('time.sleep')
     mock_delete_pid = mocker.patch('man_llama.pid_llama.delete_pid_file')
 
-    success, message = man_llama.stop_llama_server(force=False)
+    success, message = llama_man.stop_llama_server(force=False)
 
     assert success
     assert "stopped gracefully" in message
@@ -206,7 +206,7 @@ def test_stop_server_graceful_fail_no_force(mocker):
     mock_delete_pid = mocker.patch('man_llama.pid_llama.delete_pid_file')
     mock_subprocess_run = mocker.patch('subprocess.run') # For potential force kill
 
-    success, message = man_llama.stop_llama_server(force=False)
+    success, message = llama_man.stop_llama_server(force=False)
 
     assert not success
     assert "did not stop gracefully" in message

@@ -1,10 +1,10 @@
-# man_llama.py
+# llama_man.py
 import os
 import sys
 import subprocess
 import time
 import signal
-import pid_llama
+import llama_pid
 # REMOVED: from config_loader import LLAMA_CONFIG
 
 # --- Hardcoded Configuration ---
@@ -24,11 +24,11 @@ def start_llama_server():
     Returns tuple (success: bool, message: str, pid: int | None).
     """
     pid = pid_llama.read_pid()
-    if pid and pid_llama.is_process_running(pid):
+    if pid and llama_pid.is_process_running(pid):
         return False, f"Server already running with PID {pid}.", pid
 
-    if pid and not pid_llama.is_process_running(pid):
-        pid_llama.delete_pid_file()
+    if pid and not llama_pid.is_process_running(pid):
+        llama_pid.delete_pid_file()
 
     # Use constants defined above
     if not SERVER_PATH or not os.path.exists(SERVER_PATH):
@@ -59,13 +59,13 @@ def start_llama_server():
              pid_llama.delete_pid_file()
              return False, f"Server process failed on startup (exit code {process.poll()}). Command: {cmd_str}", None
 
-        if not pid_llama.write_pid(process.pid):
+        if not llama_pid.write_pid(process.pid):
             return True, f"Server started (PID {process.pid}) but failed to write PID file.", process.pid
         else:
             return True, f"Server started successfully with PID {process.pid}.", process.pid
 
     except Exception as e:
-        pid_llama.delete_pid_file()
+        llama_pid.delete_pid_file()
         return False, f"Failed to start server process: {e}. Command: {cmd_str}", None
 
 # --- stop_llama_server and status_llama_server remain unchanged ---
@@ -77,11 +77,11 @@ def stop_llama_server(force=False):
     Returns tuple (success: bool, message: str).
     """
     # (Logic remains the same as previous version, uses pid_llama)
-    pid = pid_llama.read_pid()
+    pid = llama_pid.read_pid()
     if not pid: return True, "Server not running (no PID file)."
     if not pid_llama.is_process_running(pid):
         msg = f"Stale PID {pid} found. Cleaning up PID file."
-        pid_llama.delete_pid_file(); return True, msg
+        llama_pid.delete_pid_file(); return True, msg
 
     stopped_gracefully = False
     try:
@@ -89,9 +89,9 @@ def stop_llama_server(force=False):
         os.kill(pid, sig)
         for _ in range(5):
             time.sleep(1);
-            if not pid_llama.is_process_running(pid): stopped_gracefully = True; break
+            if not llama_pid.is_process_running(pid): stopped_gracefully = True; break
     except Exception as e:
-        if not pid_llama.is_process_running(pid): stopped_gracefully = True
+        if not llama_pid.is_process_running(pid): stopped_gracefully = True
         elif not force: return False, f"Stop signal failed: {e}. Try --force."
 
     if stopped_gracefully:
@@ -104,13 +104,13 @@ def stop_llama_server(force=False):
             subprocess.run(['taskkill', '/F', '/PID', str(pid)], check=True, capture_output=True)
         else:
             os.kill(pid, signal.SIGTERM); time.sleep(1)
-            if pid_llama.is_process_running(pid): os.kill(pid, signal.SIGKILL); time.sleep(0.5)
-        if not pid_llama.is_process_running(pid):
-             pid_llama.delete_pid_file(); return True, f"Server PID {pid} terminated forcefully."
+            if llama_pid.is_process_running(pid): os.kill(pid, signal.SIGKILL); time.sleep(0.5)
+        if not llama_pid.is_process_running(pid):
+             llama_pid.delete_pid_file(); return True, f"Server PID {pid} terminated forcefully."
         else: return False, "Failed to force kill process."
     except Exception as e:
-         if not pid_llama.is_process_running(pid):
-             pid_llama.delete_pid_file(); return True, f"Force stop error but process died: {e}"
+         if not llama_pid.is_process_running(pid):
+             llama_pid.delete_pid_file(); return True, f"Force stop error but process died: {e}"
          return False, f"Force stop error: {e}"
 
 def status_llama_server():
@@ -119,11 +119,11 @@ def status_llama_server():
     Returns tuple (status_string: str, message: str).
     """
     # (Logic remains the same, uses pid_llama)
-    pid = pid_llama.read_pid()
+    pid = llama_pid.read_pid()
     if pid:
-        if pid_llama.is_process_running(pid):
+        if llama_pid.is_process_running(pid):
             return "RUNNING", f"Server is RUNNING with PID {pid}."
         else:
-            return "STALE_PID", f"Server is STOPPED (Stale PID {pid} found in '{pid_llama.PID_FILENAME}')."
+            return "STALE_PID", f"Server is STOPPED (Stale PID {pid} found in '{llama_pid.PID_FILENAME}')."
     else:
-        return "STOPPED", f"Server is STOPPED (No PID file '{pid_llama.PID_FILENAME}' found)."
+        return "STOPPED", f"Server is STOPPED (No PID file '{llama_pid.PID_FILENAME}' found)."

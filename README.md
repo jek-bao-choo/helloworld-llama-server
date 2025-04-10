@@ -40,8 +40,8 @@ my_llama_cli/
 │   ├── test_chatpoint.py       # Tests for chatpoint.py (Rename from test_sendchat.py) <-- RENAMED TEST
 │   └── test_cli.py             # Tests for cli.py
 ├── .gitignore                  # Standard Git ignore file (Recommended)
-├── pid_llama.py                # Module for PID file and process checking logic
-├── man_llama.py                # Module for server start/stop/status logic (hardcoded config)
+├── llama_pid.py                # Module for PID file and process checking logic
+├── llama_man.py                # Module for server start/stop/status logic (hardcoded config)
 ├── chatpoint.py                # Module for chat interaction logic using LiteLLM (hardcoded config/switcher) <-- RENAMED
 ├── cli_server.py                      # Module defining Click command(s) and orchestration
 ├── main.py                     # Minimal main application entry point script

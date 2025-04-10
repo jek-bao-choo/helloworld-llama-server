@@ -3,7 +3,7 @@ import litellm
 import sys
 
 # --- Hardcoded Configuration ---
-# Should match the port used in man_llama.py
+# Should match the port used in llama_man.py
 LLAMA_PORT = 8012
 # Ensure API Base includes /v1 if required by llama-server's OpenAI endpoint
 API_BASE = f"http://127.0.0.1:{LLAMA_PORT}/v1"
