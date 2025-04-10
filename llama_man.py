@@ -2,71 +2,98 @@
 import os
 import sys
 import subprocess
-import time       # Keep time for sleep after start
+import time
 import signal
-# REMOVED: import click
-import llama_pid  # Keep updated import
+import llama_pid
 
-# --- Hardcoded Configuration ---
-SERVER_PATH = "bin/llama-b5061-bin-macos-x64/llama-server"
-MODEL_PATH = "model/gemma-3-1b-it-Q4_K_M.gguf"
-PORT = 8012 # Export PORT so cli_server can build URL
+# --- Determine Base Directory of this script ---
+# __file__ is the path to the current script (llama_man.py)
+# os.path.dirname gets the directory containing the script.
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# --- Configuration Paths Relative to this Script ---
+# Construct absolute paths assuming bin/ and model/ are relative to llama_man.py
+SERVER_PATH = os.path.join(_BASE_DIR, "bin/llama-b5061-bin-macos-x64/llama-server")
+MODEL_PATH = os.path.join(_BASE_DIR, "model/gemma-3-1b-it-Q4_K_M.gguf")
+# Note: Adjust the relative parts ("bin/...", "model/...") if your actual structure differs.
+
+# --- Other Configuration ---
+PORT = 8012
 CTX_SIZE = 0
 BATCH_SIZE = 1024
 UB = 1024
 CACHE_REUSE = 256
-# --- End Hardcoded Configuration ---
+# --- End Configuration ---
 
 # --- Server Management Functions ---
-# start_llama_server, stop_llama_server, status_llama_server remain unchanged from previous step
 
 def start_llama_server():
     """
-    Starts the llama-server process using hardcoded settings.
+    Starts the llama-server process using paths relative to this script's location.
     Returns tuple (success: bool, message: str, pid: int | None).
     """
-    # ... (implementation unchanged) ...
     pid = llama_pid.read_pid()
     if pid and llama_pid.is_process_running(pid):
         return False, f"Server already running with PID {pid}.", pid
     if pid and not llama_pid.is_process_running(pid):
         llama_pid.delete_pid_file()
+        print(f"Cleaned up stale PID file for PID {pid}.")
+
+    # Check the constructed absolute paths
     if not SERVER_PATH or not os.path.exists(SERVER_PATH):
-       return False, f"Server executable path not found or not configured: {SERVER_PATH}", None
+       # The path is now absolute or relative to this file, error is more direct
+       return False, f"Server executable path not found: '{SERVER_PATH}'. Ensure it exists relative to llama_man.py.", None
     if not MODEL_PATH or not os.path.exists(MODEL_PATH):
-       return False, f"Model file path not found or not configured: {MODEL_PATH}", None
+       return False, f"Model file path not found: '{MODEL_PATH}'. Ensure it exists relative to llama_man.py.", None
+
+    # Command uses the calculated absolute paths
     command = [
         SERVER_PATH, '-m', MODEL_PATH, '--port', str(PORT),
         '--ctx-size', str(CTX_SIZE), '-b', str(BATCH_SIZE),
         '-ub', str(UB), '--cache-reuse', str(CACHE_REUSE)
     ]
     cmd_str = ' '.join(command)
+    print(f"Attempting to start server with command: {cmd_str}")
+
     try:
         startupinfo = None
         if sys.platform == 'win32':
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startupinfo.wShowWindow = subprocess.SW_HIDE
+
         process = subprocess.Popen(
-            command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, startupinfo=startupinfo
+            command,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            startupinfo=startupinfo
+            # Add creationflags=subprocess.CREATE_NO_WINDOW on Windows if STARTUPINFO isn't enough
+            # creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
         )
+        print(f"Launched process with PID: {process.pid}. Waiting briefly...")
         time.sleep(2.0)
+
         if process.poll() is not None:
              llama_pid.delete_pid_file()
-             return False, f"Server process failed on startup (exit code {process.poll()}). Command: {cmd_str}", None
+             return False, f"Server process failed on startup (exit code {process.poll()}). Check server logs if possible. Command: {cmd_str}", None
+
         if not llama_pid.write_pid(process.pid):
-            return True, f"Server started (PID {process.pid}) but failed to write PID file.", process.pid
+             print(f"Warning: Server started (PID {process.pid}) but failed to write PID file.", file=sys.stderr)
+             return True, f"Server started (PID {process.pid}) but failed to write PID file.", process.pid
         else:
+            print(f"Server started successfully with PID {process.pid} and PID file written.")
             return True, f"Server started successfully with PID {process.pid}.", process.pid
+
+    except FileNotFoundError:
+        return False, f"Failed to start server: Executable not found at path '{SERVER_PATH}'. Check path and permissions.", None
+    except PermissionError:
+        return False, f"Failed to start server: Permission denied for executable at '{SERVER_PATH}'. Check permissions.", None
     except Exception as e:
         llama_pid.delete_pid_file()
         return False, f"Failed to start server process: {e}. Command: {cmd_str}", None
 
+# stop_llama_server and status_llama_server remain unchanged from previous correct versions
 def stop_llama_server(force=False):
-    """
-    Stops the running llama-server process identified by the PID file.
-    Returns tuple (success: bool, message: str).
-    """
     # ... (implementation unchanged) ...
     pid = llama_pid.read_pid()
     if not pid: return True, "Server not running (no PID file)."
@@ -101,49 +128,37 @@ def stop_llama_server(force=False):
          return False, f"Force stop error: {e}"
 
 def status_llama_server():
-    """
-    Checks the status of the llama-server process.
-    Returns tuple (status_string: str, message: str).
-    """
     # ... (implementation unchanged) ...
     pid = llama_pid.read_pid()
     if pid:
         if llama_pid.is_process_running(pid):
             return "RUNNING", f"Server is RUNNING with PID {pid}."
         else:
-            return "STALE_PID", f"Server is STOPPED (Stale PID {pid} found in '{llama_pid.PID_FILENAME}')."
+            llama_pid.delete_pid_file() # Clean up stale PID
+            return "STALE_PID", f"Server is STOPPED (Stale PID {pid} found in '{llama_pid.PID_FILENAME}' and cleaned up)."
     else:
         return "STOPPED", f"Server is STOPPED (No PID file '{llama_pid.PID_FILENAME}' found)."
 
 
-# --- Refactored Helper Function ---
+# ensure_server_running_or_fail remains unchanged (uses the modified start_llama_server)
 def ensure_server_running_or_fail():
     """
-    Checks server status, starts if needed using internal defaults.
-    No direct user feedback here (no click dependency).
-
-    Returns:
-        Tuple (status_code: str, message: str)
-        status_code can be "RUNNING", "FAILED_START"
+    Checks server status, starts if needed using configured settings.
+    Returns: Tuple (status_code: str, message: str)
+    status_code can be "RUNNING", "FAILED_START"
     """
     status_code, initial_message = status_llama_server()
-    # Don't print here - let the caller (cli_server) do it.
-    # click.echo(f"Initial server status: {status_code} - {initial_message}")
 
     if status_code == "RUNNING":
-        return "RUNNING", initial_message # Return immediately if already running
+        return "RUNNING", initial_message
 
-    # If STOPPED or STALE_PID, attempt to start
-    # Don't print here: click.echo("Server not running. Attempting auto-start...")
-    success, start_message, pid = start_llama_server() # Uses internal config
+    print("Server not running or PID stale. Attempting auto-start...")
+    success, start_message, pid = start_llama_server() # Uses new path logic
 
     if success:
-        # Don't print here: click.secho(f"Auto-start successful: {start_message}", fg='green')
-        time.sleep(2.5) # Keep brief pause after successful start
-        # Return RUNNING status and the success message from start_llama_server
+        print(f"Auto-start successful: {start_message}")
+        time.sleep(2.5)
         return "RUNNING", f"Auto-start successful: {start_message}"
     else:
-        # Don't print here: click.secho(f"Auto-start failed: {start_message}", fg='red')
-        # Return FAILED status and the error message from start_llama_server
+        print(f"Error: Auto-start failed: {start_message}", file=sys.stderr)
         return "FAILED_START", f"Auto-start failed: {start_message}"
-# --- End Refactored Helper ---
