@@ -1,4 +1,4 @@
-# cli_server.py
+# clitest_server.py
 import click
 import sys
 import requests # For making HTTP requests
